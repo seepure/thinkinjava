@@ -6,6 +6,27 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * In sub01, we stop the thread by setting the flag to be false in the running loop(which is often a while()
+ * loop) of the thread.
+ * However, this approach can not stop a thread immediately who is blocked (IO blocked, sleep(), synchronize etc.). in
+ * sub02, we will show you how to stop a blocked thread. In addition, we will discuss the difference among
+ * Thread.interrupt() (= Future.cancel(true)),
+ * ExecutorService.shutdown(), ExecutorService.shutdownNow(), ExecutorService.awaitTermination().
+ *
+ * 1. Let's talking about how to stop blocked thread.
+ * By running this example, we find that we can only terminate(or say, interrupt) the SleepBlocked thread (In fact, we can
+ * interrupt threads who are blocked by the methods might throw an InterruptedException). But we can not interrupt the
+ * IOBlocked thread and SynchronizedBlocked thread by simpling calling Future.cancel(true) or Thread.interrupt().
+ *  1.1 In order to stop an IOBlocked Thread, we can close the blocking IO resources of the thread,
+ *  	in this example, we can do it like that:
+ * 			IOBlocked.in.close();
+ * 		but this approach has disadvantage because in.close() may cause the current work can not stop properly. For example,
+ * 		if the Thread is writing data to Kafka, and the Kafka client is suddenly close() by your code, you might lost data.
+ * 		We will show you how we properly interrupt an IOBlocked Thread in next sub part.
+ * 	1.2 It seems that we can not interrupt a SynchronizedBlocked Thread . T_T. But we can interrupt the Thread who is trying
+ * 	to get the lock by using the implements of Lock.
+ *
+ * 2.
  * 这个小节还有几个比较重要的话题:
  * Thread.interrupt() 和 ExecutorService.shutdown、ExecutorService.shutdownNow() 的区别
  * 	1. shutdownNow 和 Thread.interrupt() 等价: 只能这么说, shutdownNow的底层就是调用了 Thread.interrupt()
