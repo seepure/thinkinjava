@@ -9,14 +9,16 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 从这个例子可以看出shutdown和 shutdownNow的区别，
- * shutdownNow一旦被调用，会立刻向executorService持有的所有线程调用 cancel方法，
- * shutdown则不会
+ * NIO provides more humanize interruption. Thread.interrupt() can cause the blocked NIO
+ * throw an ClosedByInterruptException.
+ * What's more, we can find the difference between ExecutorService.shutdown() and ExecutorService.shutdownNow()
+  * shutdownNow will immediately call the Thread.interrupt() of the threads it has. while shutdown would not do that.(???
+ * it seems that jdk1.8 is not the same as before! )
  */
 public class NIOInterruption {
 	public static void main(String[] args) throws Exception {
-		//testShutdown();
-		testShutdownNow();
+		testShutdown();
+		//testShutdownNow();
 	}
 
 	public static void testShutdown() throws Exception {

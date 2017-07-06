@@ -26,16 +26,15 @@ import java.util.concurrent.TimeUnit;
  * 	1.2 It seems that we can not interrupt a SynchronizedBlocked Thread . T_T. But we can interrupt the Thread who is trying
  * 	to get the lock by using the implements of Lock.
  *
- * 2.
- * 这个小节还有几个比较重要的话题:
- * Thread.interrupt() 和 ExecutorService.shutdown、ExecutorService.shutdownNow() 的区别
- * 	1. shutdownNow 和 Thread.interrupt() 等价: 只能这么说, shutdownNow的底层就是调用了 Thread.interrupt()
- *  ，而Future.cancel()底层 也很可能是Thread.interrupt()实现的，具体还要再试试
- *  2. shutdown和 shutdownNow的区别，
- * shutdownNow一旦被调用，会立刻向executorService持有的所有线程调用 cancel方法，
- * shutdown则不会
- *  3. Thread.interrupt()是无法立刻中断线程的，它只能改变线程的
- *  interrupt status, 从而使得线程能够退出while循环
+ * 2. Thread.interrupt(), ExecutorService.shutdown, ExecutorService.shutdownNow()
+ * 	2.1. shutdownNow equals to Thread.interrupt() , or say, shutdownNow based on Thread.interrupt()
+ *  , and Future.cancel(true) is also based on Thread.interrupt().
+ *  2.2. shutdown and shutdownNow :
+ * Once shutdownNow is called，ExecutorService will call Future.cancel(true) to all the threads it has.
+ * While shutdown will not.
+ *  2.3. Thread.interrupt() can not terminate thread immediately, it can only change the
+ *  interrupt status of threads, and then break the while(interrupted()) loop of the running thread (if the thread has
+ *  such loop)
  *
  */
 public class InterruptAllTest {
